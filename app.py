@@ -17,4 +17,12 @@ if uploaded_file is not None:
 
     st.subheader("Column Names")
     st.write(list(df.columns))
+    st.subheader("Dataset Information")
+st.write(df.dtypes)
+
+st.subheader("Missing Values")
+st.write(df.isnull().sum())
+
+st.subheader("Statistical Summary")
+st.write(df.describe())
   
