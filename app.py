@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+
 st.title("AI Data Insights Assistant")
 
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
@@ -17,24 +18,26 @@ if uploaded_file is not None:
 
     st.subheader("Column Names")
     st.write(list(df.columns))
+
     st.subheader("Dataset Information")
-st.write(df.dtypes)
+    st.write(df.dtypes)
 
-st.subheader("Missing Values")
-st.write(df.isnull().sum())
+    st.subheader("Missing Values")
+    st.write(df.isnull().sum())
 
-st.subheader("Statistical Summary")
-st.write(df.describe())
-  numeric_columns = df.select_dtypes(include=['number']).columns
+    st.subheader("Statistical Summary")
+    st.write(df.describe())
 
-if len(numeric_columns) > 0:
-    st.subheader("Data Visualization")
+    numeric_columns = df.select_dtypes(include=['number']).columns
 
-    selected_column = st.selectbox(
-        "Select a numeric column",
-        numeric_columns
-    )
+    if len(numeric_columns) > 0:
+        st.subheader("Data Visualization")
 
-    fig, ax = plt.subplots()
-    df[selected_column].hist(ax=ax)
-    st.pyplot(fig)
+        selected_column = st.selectbox(
+            "Select a numeric column",
+            numeric_columns
+        )
+
+        fig, ax = plt.subplots()
+        df[selected_column].hist(ax=ax)
+        st.pyplot(fig)
