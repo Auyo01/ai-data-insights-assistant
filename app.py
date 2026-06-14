@@ -27,6 +27,23 @@ if uploaded_file is not None:
 
     st.subheader("Statistical Summary")
     st.write(df.describe())
+    st.subheader("Automated Insights")
+
+rows, cols = df.shape
+
+st.write(f"The dataset contains {rows} rows and {cols} columns.")
+
+missing = df.isnull().sum().sum()
+
+st.write(f"There are {missing} missing values in the dataset.")
+
+numeric_cols = df.select_dtypes(include=['number']).columns
+
+if len(numeric_cols) > 0:
+    st.write(
+        f"The dataset contains {len(numeric_cols)} numeric columns available for analysis."
+    )
+  
 
     numeric_columns = df.select_dtypes(include=['number']).columns
 
