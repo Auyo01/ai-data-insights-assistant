@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 
 st.title("AI Data Insights Assistant")
 
+st.write(
+    "Upload a CSV file to generate summaries, visualizations, and insights."
+)
+
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 
 if uploaded_file is not None:
@@ -28,6 +32,15 @@ if uploaded_file is not None:
     st.subheader("Statistical Summary")
     st.write(df.describe())
 
+    summary_csv = df.describe().to_csv()
+
+    st.download_button(
+        label="📥 Download Summary Report",
+        data=summary_csv,
+        file_name="summary_report.csv",
+        mime="text/csv"
+    )
+
     st.subheader("Automated Insights")
 
     rows, cols = df.shape
@@ -36,12 +49,18 @@ if uploaded_file is not None:
     missing = df.isnull().sum().sum()
     st.write(f"There are {missing} missing values in the dataset.")
 
-    numeric_cols = df.select_dtypes(include=['number']).columns
+    numeric_cols = df.select_dtypes(include=["number"]).columns
 
     if len(numeric_cols) > 0:
         st.write(
             f"The dataset contains {len(numeric_cols)} numeric columns available for analysis."
         )
+
+    if len(numeric_cols) > 1:
+        st.subheader("Correlation Analysis")
+
+        correlation_matrix = df[numeric_cols].corr()
+        st.dataframe(correlation_matrix)
 
     if len(numeric_cols) > 0:
         st.subheader("Data Visualization")
@@ -51,6 +70,23 @@ if uploaded_file is not None:
             numeric_cols
         )
 
+        chart_type = st.selectbox(
+            "Select chart type",
+            ["Histogram", "Line Chart", "Bar Chart"]
+        )
+
         fig, ax = plt.subplots()
-        df[selected_column].hist(ax=ax)
+
+        if chart_type == "Histogram":
+            df[selected_column].hist(ax=ax)
+
+        elif chart_type == "Line Chart":
+            ax.plot(df[selected_column])
+
+        elif chart_type == "Bar Chart":
+            ax.bar(
+                range(len(df[selected_column])),
+                df[selected_column]
+            )
+
         st.pyplot(fig)
