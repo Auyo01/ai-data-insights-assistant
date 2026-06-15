@@ -41,20 +41,43 @@ if uploaded_file is not None:
         mime="text/csv"
     )
 
-    st.subheader("Automated Insights")
+    st.subheader("AI Insights")
 
     rows, cols = df.shape
-    st.write(f"The dataset contains {rows} rows and {cols} columns.")
-
     missing = df.isnull().sum().sum()
-    st.write(f"There are {missing} missing values in the dataset.")
-
     numeric_cols = df.select_dtypes(include=["number"]).columns
 
-    if len(numeric_cols) > 0:
-        st.write(
-            f"The dataset contains {len(numeric_cols)} numeric columns available for analysis."
+    insights = []
+
+    insights.append(
+        f"This dataset contains {rows} rows and {cols} columns."
+    )
+
+    if missing > 0:
+        insights.append(
+            f"The dataset contains {missing} missing values that may affect analysis quality."
         )
+    else:
+        insights.append(
+            "No missing values were detected in the dataset."
+        )
+
+    if len(numeric_cols) > 0:
+        insights.append(
+            f"There are {len(numeric_cols)} numeric columns available for statistical analysis."
+        )
+
+        for col in numeric_cols:
+            mean_value = df[col].mean()
+            max_value = df[col].max()
+            min_value = df[col].min()
+
+            insights.append(
+                f"{col}: average={mean_value:.2f}, minimum={min_value:.2f}, maximum={max_value:.2f}"
+            )
+
+    for insight in insights:
+        st.write("• " + insight)
 
     if len(numeric_cols) > 1:
         st.subheader("Correlation Analysis")
