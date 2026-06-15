@@ -27,32 +27,28 @@ if uploaded_file is not None:
 
     st.subheader("Statistical Summary")
     st.write(df.describe())
+
     st.subheader("Automated Insights")
 
-rows, cols = df.shape
+    rows, cols = df.shape
+    st.write(f"The dataset contains {rows} rows and {cols} columns.")
 
-st.write(f"The dataset contains {rows} rows and {cols} columns.")
+    missing = df.isnull().sum().sum()
+    st.write(f"There are {missing} missing values in the dataset.")
 
-missing = df.isnull().sum().sum()
+    numeric_cols = df.select_dtypes(include=['number']).columns
 
-st.write(f"There are {missing} missing values in the dataset.")
+    if len(numeric_cols) > 0:
+        st.write(
+            f"The dataset contains {len(numeric_cols)} numeric columns available for analysis."
+        )
 
-numeric_cols = df.select_dtypes(include=['number']).columns
-
-if len(numeric_cols) > 0:
-    st.write(
-        f"The dataset contains {len(numeric_cols)} numeric columns available for analysis."
-    )
-  
-
-    numeric_columns = df.select_dtypes(include=['number']).columns
-
-    if len(numeric_columns) > 0:
+    if len(numeric_cols) > 0:
         st.subheader("Data Visualization")
 
         selected_column = st.selectbox(
             "Select a numeric column",
-            numeric_columns
+            numeric_cols
         )
 
         fig, ax = plt.subplots()
