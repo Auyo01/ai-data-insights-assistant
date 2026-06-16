@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,30 +14,35 @@ st.title("📊 AI Data Insights Assistant")
 
 st.sidebar.title("Navigation")
 st.sidebar.info(
-    "Upload a CSV dataset to generate insights, visualizations, and reports."
+    "Upload a CSV or Excel dataset to generate AI insights, visualizations, and reports."
 )
 
 st.sidebar.markdown("### Features")
 st.sidebar.markdown("""
-- Dataset Preview
-- Statistical Summary
+- CSV Upload
+- Excel Upload
 - AI Analysis (Llama 3)
+- Statistical Summary
 - Correlation Analysis
 - Data Visualization
 - Download Reports
 """)
 
 st.info(
-    "Upload a CSV file to explore your data, generate insights, and visualize trends."
+    "Upload a CSV or Excel file to explore your data, generate AI insights, and visualize trends."
 )
 
 uploaded_file = st.file_uploader(
-    "Upload a CSV file",
-    type=["csv"]
+    "Upload a dataset",
+    type=["csv", "xlsx"]
 )
 
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+
+    if uploaded_file.name.endswith(".csv"):
+        df = pd.read_csv(uploaded_file)
+    else:
+        df = pd.read_excel(uploaded_file)
 
     st.subheader("Dataset Preview")
     st.dataframe(df.head())
@@ -95,14 +101,14 @@ if uploaded_file is not None:
         prompt = f"""
         You are an expert data analyst.
 
-        Analyze the dataset and provide:
+        Analyze this dataset and provide:
 
         1. Key observations
         2. Data quality issues
         3. Important trends
         4. Actionable recommendations
 
-        Dataset Information:
+        Dataset:
 
         {dataset_summary}
         """
@@ -129,6 +135,7 @@ if uploaded_file is not None:
         st.subheader("Correlation Analysis")
 
         correlation_matrix = df[numeric_cols].corr()
+
         st.dataframe(correlation_matrix)
 
     if len(numeric_cols) > 0:
