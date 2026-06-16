@@ -2,13 +2,37 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-st.title("AI Data Insights Assistant")
-
-st.write(
-    "Upload a CSV file to generate summaries, visualizations, and insights."
+st.set_page_config(
+    page_title="AI Data Insights Assistant",
+    page_icon="📊",
+    layout="wide"
 )
 
-uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+st.title("📊 AI Data Insights Assistant")
+
+st.sidebar.title("Navigation")
+st.sidebar.info(
+    "Upload a CSV dataset to generate insights, visualizations, and reports."
+)
+
+st.sidebar.markdown("### Features")
+st.sidebar.markdown("""
+- Dataset Preview
+- Statistical Summary
+- AI Insights
+- Correlation Analysis
+- Data Visualization
+- Download Reports
+""")
+
+st.info(
+    "Upload a CSV file to explore your data, generate insights, and visualize trends."
+)
+
+uploaded_file = st.file_uploader(
+    "Upload a CSV file",
+    type=["csv"]
+)
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
@@ -17,8 +41,14 @@ if uploaded_file is not None:
     st.dataframe(df.head())
 
     st.subheader("Dataset Summary")
-    st.write(f"Rows: {df.shape[0]}")
-    st.write(f"Columns: {df.shape[1]}")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric("Rows", df.shape[0])
+
+    with col2:
+        st.metric("Columns", df.shape[1])
 
     st.subheader("Column Names")
     st.write(list(df.columns))
@@ -83,6 +113,7 @@ if uploaded_file is not None:
         st.subheader("Correlation Analysis")
 
         correlation_matrix = df[numeric_cols].corr()
+
         st.dataframe(correlation_matrix)
 
     if len(numeric_cols) > 0:
