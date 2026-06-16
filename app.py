@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from groq import Groq
 
 st.set_page_config(
     page_title="AI Data Insights Assistant",
@@ -19,7 +20,7 @@ st.sidebar.markdown("### Features")
 st.sidebar.markdown("""
 - Dataset Preview
 - Statistical Summary
-- AI Insights
+- AI Analysis (Llama 3)
 - Correlation Analysis
 - Data Visualization
 - Download Reports
@@ -71,49 +72,63 @@ if uploaded_file is not None:
         mime="text/csv"
     )
 
-    st.subheader("AI Insights")
-
-    rows, cols = df.shape
-    missing = df.isnull().sum().sum()
     numeric_cols = df.select_dtypes(include=["number"]).columns
 
-    insights = []
+    st.subheader("🤖 AI Analysis (Llama 3)")
 
-    insights.append(
-        f"This dataset contains {rows} rows and {cols} columns."
-    )
+    try:
+        client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-    if missing > 0:
-        insights.append(
-            f"The dataset contains {missing} missing values that may affect analysis quality."
-        )
-    else:
-        insights.append(
-            "No missing values were detected in the dataset."
-        )
+        dataset_summary = f"""
+        Dataset Shape: {df.shape}
 
-    if len(numeric_cols) > 0:
-        insights.append(
-            f"There are {len(numeric_cols)} numeric columns available for statistical analysis."
-        )
+        Columns:
+        {list(df.columns)}
 
-        for col in numeric_cols:
-            mean_value = df[col].mean()
-            max_value = df[col].max()
-            min_value = df[col].min()
+        Missing Values:
+        {df.isnull().sum().to_dict()}
 
-            insights.append(
-                f"{col}: average={mean_value:.2f}, minimum={min_value:.2f}, maximum={max_value:.2f}"
+        Statistical Summary:
+        {df.describe().to_string()}
+        """
+
+        prompt = f"""
+        You are an expert data analyst.
+
+        Analyze the dataset and provide:
+
+        1. Key observations
+        2. Data quality issues
+        3. Important trends
+        4. Actionable recommendations
+
+        Dataset Information:
+
+        {dataset_summary}
+        """
+
+        with st.spinner("Generating AI insights..."):
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
             )
 
-    for insight in insights:
-        st.write("• " + insight)
+            ai_response = response.choices[0].message.content
+
+        st.write(ai_response)
+
+    except Exception as e:
+        st.error(f"AI analysis unavailable: {e}")
 
     if len(numeric_cols) > 1:
         st.subheader("Correlation Analysis")
 
         correlation_matrix = df[numeric_cols].corr()
-
         st.dataframe(correlation_matrix)
 
     if len(numeric_cols) > 0:
